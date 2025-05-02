@@ -6,7 +6,7 @@ router = APIRouter(prefix="/contextos", tags=["Contextos"])
 
 @router.post("/", response_model=ContextoOut)
 def crear_contexto(contexto: ContextoCreate):
-    id_contexto = crud_contextos.crear_contexto(
+    id_contexto = crud_contextos.creaar_contexto(
         id_chat=contexto.id_chat,
         descripcion=contexto.descripcion
     )
