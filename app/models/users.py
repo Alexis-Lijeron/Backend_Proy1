@@ -23,7 +23,9 @@ class UserLogin(BaseModel):
     contrasena: str
 
 
-class UserLoginOut(BaseModel):
+class TokenData(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
     id_usuario: int
     nombre: str
     correo: EmailStr
