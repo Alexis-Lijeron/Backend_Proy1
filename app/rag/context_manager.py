@@ -2,13 +2,14 @@ import logging
 from sklearn.metrics.pairwise import cosine_similarity
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 
 class ContextManager:
     def __init__(self):
-        self.embeddings = OpenAIEmbeddings(openai_api_key="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")
+        self.embeddings = OpenAIEmbeddings(openai_api_key=settings.OPENAI_API_KEY)
 
     def get_similarity(self, text1: str, text2: str) -> float:
         """Calcula la similitud coseno entre dos textos usando embeddings."""

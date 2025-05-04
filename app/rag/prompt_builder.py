@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 
 from langchain_openai import ChatOpenAI
 from app.rag.feedback import FeedbackDBPostgres
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ class PromptBuilder:
         llm = ChatOpenAI(
             model_name="gpt-3.5-turbo",
             temperature=0.7,
-            openai_api_key="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",
+            openai_api_key=settings.OPENAI_API_KEY,
         )
 
         # Opcional: podrías traer feedback relacionado con el mensaje anterior
@@ -56,7 +57,7 @@ Historial resumido:
         llm = ChatOpenAI(
             model_name="gpt-3.5-turbo",
             temperature=0.7,
-            openai_api_key="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",
+            openai_api_key=settings.OPENAI_API_KEY,
         )
 
         contenido = "\n\n".join([r["content"] for r in results])

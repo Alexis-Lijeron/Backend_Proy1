@@ -9,16 +9,24 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_core.documents import Document
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+
 class EmbeddingManager:
-    def __init__(self, file_path: str, persist_dir: str = "chroma_db", chunk_size: int = 500, chunk_overlap: int = 50):
+    def __init__(
+        self,
+        file_path: str,
+        persist_dir: str = "chroma_db",
+        chunk_size: int = 500,
+        chunk_overlap: int = 50,
+    ):
         self.file_path = file_path
         self.persist_dir = persist_dir
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.embeddings = OpenAIEmbeddings(openai_api_key="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")
+        self.embeddings = OpenAIEmbeddings(openai_api_key=settings.OPENAI_API_KEY)
         self.vectorstore = None
 
         os.makedirs(self.persist_dir, exist_ok=True)
@@ -32,8 +40,7 @@ class EmbeddingManager:
         loader = TextLoader(self.file_path, encoding="utf-8")
         documents = loader.load()
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap
+            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
         )
         texts = text_splitter.split_documents(documents)
         logger.info(f"✅ {len(texts)} chunks generados.")
@@ -50,7 +57,7 @@ class EmbeddingManager:
             if previous_hash == current_hash:
                 self.vectorstore = Chroma(
                     persist_directory=self.persist_dir,
-                    embedding_function=self.embeddings
+                    embedding_function=self.embeddings,
                 )
                 logger.info("✅ Reutilizando embeddings existentes.")
                 return
@@ -60,13 +67,18 @@ class EmbeddingManager:
         self.vectorstore = Chroma.from_documents(
             documents=documents,
             embedding=self.embeddings,
-            persist_directory=self.persist_dir
+            persist_directory=self.persist_dir,
         )
         with open(hash_path, "w") as f:
             f.write(current_hash)
 
     def search(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
         if not self.vectorstore:
-            raise ValueError("⚠️ Vectorstore no inicializado. Ejecuta initialize() primero.")
+            raise ValueError(
+                "⚠️ Vectorstore no inicializado. Ejecuta initialize() primero."
+            )
         docs = self.vectorstore.similarity_search(query, k=k)
-        return [{"id": i + 1, "content": d.page_content, "metadata": d.metadata} for i, d in enumerate(docs)]
+        return [
+            {"id": i + 1, "content": d.page_content, "metadata": d.metadata}
+            for i, d in enumerate(docs)
+        ]

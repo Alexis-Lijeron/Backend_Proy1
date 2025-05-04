@@ -7,6 +7,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
+from app.core.config import settings
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,9 +18,7 @@ CHUNK_OVERLAP = 50
 CHROMA_DIR = "chroma_db_metadatos"
 
 # Inicializar embeddings
-embeddings = OpenAIEmbeddings(
-    openai_api_key="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"
-)
+embeddings = OpenAIEmbeddings(openai_api_key=settings.OPENAI_API_KEY)
 
 
 def detectar_metadatos(texto):
