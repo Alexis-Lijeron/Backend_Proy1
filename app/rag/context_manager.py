@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class ContextManager:
     def __init__(self):
-        self.embeddings = OpenAIEmbeddings(openai_api_key="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")
+        self.embeddings = OpenAIEmbeddings(openai_api_key="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")
 
     def get_similarity(self, text1: str, text2: str) -> float:
         """Calcula la similitud coseno entre dos textos usando embeddings."""

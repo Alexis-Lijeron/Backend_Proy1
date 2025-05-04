@@ -18,7 +18,7 @@ class EmbeddingManager:
         self.persist_dir = persist_dir
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.embeddings = OpenAIEmbeddings(openai_api_key="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")
+        self.embeddings = OpenAIEmbeddings(openai_api_key="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")
         self.vectorstore = None
 
         os.makedirs(self.persist_dir, exist_ok=True)
