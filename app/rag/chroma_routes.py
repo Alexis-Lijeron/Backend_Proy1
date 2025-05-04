@@ -14,6 +14,7 @@ rag_system = RAGSystem(
     persist_dir="chroma_db",
     chunk_size=500,
     chunk_overlap=50,
+    modo_feedback="sqlite",
 )
 rag_system.initialize()
 
@@ -35,7 +36,7 @@ class ChromaFeedbackRequest(BaseModel):
 # -------------------- ENDPOINTS --------------------
 
 
-@router.post("/search")
+@router.post("/search1")
 def buscar_chroma(params: ChromaSearchRequest):
     """Hace una búsqueda simple en Chroma y responde con los chunks más relevantes."""
     pregunta_filtrada = rag_system.reemplazador.reemplazar_palabras(params.pregunta)
@@ -55,7 +56,7 @@ def buscar_chroma(params: ChromaSearchRequest):
     }
 
 
-@router.post("/feedback")
+@router.post("/feedback1")
 def guardar_feedback_simple(fb: ChromaFeedbackRequest):
     """Guarda feedback simple sin vincularlo a un mensaje/chat/contexto."""
     try:

@@ -5,7 +5,7 @@ import hashlib
 import time
 
 from app.rag.core import RAGSystem
-from app.crud.mensajes import guardar_mensaje
+from app.crud.mensajes import insertar_mensaje
 from app.crud.contextos import crear_contexto  
 
 router = APIRouter(prefix="/rag", tags=["RAG"])
@@ -97,13 +97,13 @@ def buscar_respuesta(params: SearchRequest):
 
     # ------- Guardar pregunta y respuesta -------
     try:
-        id_mensaje_pregunta = guardar_mensaje(
+        id_mensaje_pregunta = insertar_mensaje(
             id_chat=params.id_chat,
             id_contexto=id_contexto_usado,
             tipo="pregunta",
             contenido=params.pregunta,
         )
-        id_mensaje_respuesta = guardar_mensaje(
+        id_mensaje_respuesta = insertar_mensaje(
             id_chat=params.id_chat,
             id_contexto=id_contexto_usado,
             tipo="respuesta",
