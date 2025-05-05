@@ -176,3 +176,76 @@ def buscar(
         return {"resultado": resultado}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/estructura")
+def analizar_estructura(documento: str):
+    try:
+        documento = documento.lower().strip()
+        archivos = os.listdir(DIRECTORIO_TXT)
+        archivo_encontrado = None
+        for archivo in archivos:
+            if documento in archivo.lower():
+                archivo_encontrado = archivo
+                break
+
+        if not archivo_encontrado:
+            raise ValueError("No se encontró el documento solicitado.")
+
+        texto = cargar_documento(archivo_encontrado)
+        lineas = texto.split("\n")
+
+        estructura = []
+        titulo_actual = None
+        capitulo_actual = None
+
+        for linea in lineas:
+            linea_norm = normalizar(linea)
+
+            # Detectar título
+            match_titulo = re.match(r"^\s*t[ií]tulo\s+([^\n]*)", linea_norm)
+            if match_titulo:
+                titulo_actual = {"titulo": linea.strip(), "capitulos": []}
+                estructura.append(titulo_actual)
+                capitulo_actual = None  # Reiniciar capítulo
+                continue
+
+            # Detectar capítulo
+            match_cap = re.match(r"^\s*cap[íi]tulo\s+([^\n]*)", linea_norm)
+            if match_cap:
+                if not titulo_actual:
+                    # Si no hay título, creamos uno por defecto
+                    titulo_actual = {"titulo": "Sin Título", "capitulos": []}
+                    estructura.append(titulo_actual)
+
+                capitulo_actual = {"capitulo": linea.strip(), "articulos": []}
+                titulo_actual["capitulos"].append(capitulo_actual)
+                continue
+
+            # Detectar artículo
+            match_art = re.match(r"^\s*art[íi]culo\s+\d+", linea_norm)
+            if match_art:
+                if not capitulo_actual:
+                    # Si no hay capítulo, creamos uno por defecto
+                    capitulo_actual = {"capitulo": "Sin Capítulo", "articulos": []}
+                    if not titulo_actual:
+                        titulo_actual = {"titulo": "Sin Título", "capitulos": []}
+                        estructura.append(titulo_actual)
+                    titulo_actual["capitulos"].append(capitulo_actual)
+
+                capitulo_actual["articulos"].append(linea.strip())
+
+        return {"estructura": estructura}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/documentos")
+def listar_documentos():
+    try:
+        archivos = os.listdir(DIRECTORIO_TXT)
+        documentos = [archivo for archivo in archivos if archivo.endswith(".txt")]
+        return {"documentos": documentos}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
