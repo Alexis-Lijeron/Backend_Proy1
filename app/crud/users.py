@@ -1,3 +1,4 @@
+from datetime import datetime
 import bcrypt
 from app.core.db_connection import get_connection
 
@@ -10,15 +11,17 @@ def crear_usuario(nombre: str, correo: str = None, contrasena: str = None):
     else:
         contrasena_hashed = None
 
+    fecha_registro = datetime.utcnow()  # 👈 asignar aquí
+
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
-            INSERT INTO usuarios (nombre, correo, contrasena)
-            VALUES (%s, %s, %s)
+            INSERT INTO usuarios (nombre, correo, contrasena, fecha_registro)
+            VALUES (%s, %s, %s, %s)
             RETURNING id_usuario, fecha_registro
             """,
-                (nombre, correo, contrasena_hashed),
+                (nombre, correo, contrasena_hashed, fecha_registro),
             )
             id_usuario, fecha_registro = cursor.fetchone()
             conn.commit()
