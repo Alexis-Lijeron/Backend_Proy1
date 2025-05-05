@@ -5,7 +5,11 @@
     venv\Scripts\activate           # (Windows)
 3. Instalar las dependencias
     pip install -r requirements.txt
-4. Levantar contenedor de base de datos
+4. Inciar alembic para migraciones (primera vez)
+    alembic init alembic
+    alembic revision --autogenerate -m "Primera migracion"
+    alembic upgrade head
+5. Levantar contenedor de base de datos
     docker-compose up -d
-5. Ejecutar 
+6. Ejecutar 
     uvicorn app.main:app --reload

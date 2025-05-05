@@ -10,3 +10,4 @@ langchain_chroma
 langchain_openai
 scikit-learn
 python-jose[cryptography]
+alembic

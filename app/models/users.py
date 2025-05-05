@@ -1,7 +1,8 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
-
+from sqlalchemy import Column, Integer, String, DateTime
+from app.db import Base
 
 class UserCreate(BaseModel):
     nombre: str
@@ -29,3 +30,13 @@ class TokenData(BaseModel):
     id_usuario: int
     nombre: str
     correo: EmailStr
+
+
+class User(Base):
+    __tablename__ = "usuarios"
+
+    id_usuario = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, nullable=False)
+    correo = Column(String, unique=True, index=True)
+    contrasena = Column(String)
+    fecha_registro = Column(DateTime, default=datetime.utcnow)
