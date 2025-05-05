@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api import users, chats, contextos, mensajes, feedbacks
-from app.rag import chroma_routes, rag_routes, chroma_metadatos_routes
+from app.rag import chroma_routes, rag_routes, chroma_metadatos_routes, consulta_txt
 
 app = FastAPI(
     title="Sistema de Chats Multi-Contexto",
@@ -16,3 +16,4 @@ app.include_router(feedbacks.router)
 app.include_router(chroma_routes.router)
 app.include_router(rag_routes.router)
 app.include_router(chroma_metadatos_routes.router)
+app.include_router(consulta_txt.router)
