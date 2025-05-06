@@ -83,7 +83,7 @@ def buscar_respuesta(params: SearchRequest):
             "",
         )
         es_contexto = rag_system.is_related_context(
-            ultima_pregunta, pregunta_filtrada, historial=historial_texto
+            ultima_pregunta, pregunta_filtrada, "", historial_texto
         )
     else:
         ultima_pregunta = ""
@@ -98,6 +98,7 @@ def buscar_respuesta(params: SearchRequest):
         id_contexto_usado = nuevo_id_contexto["id_contexto"]
     # ------- Guardar pregunta y respuesta -------
     # Generar respuesta
+    results = rag_system.search(query, k=params.k)
     combined_content = "\n\n".join([item["content"] for item in results])
     respuesta = rag_system.build_response_with_context(
         combined_content,

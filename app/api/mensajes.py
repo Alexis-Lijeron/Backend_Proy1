@@ -34,6 +34,18 @@ def insertar_mensaje(
     )
 
 
+@router.get("/chat/{id_chat}", response_model=list[MensajeOut])
+def obtener_mensajes_chat(id_chat: int, id_usuario: int = Depends(verificar_token)):
+    chat = crud_chats.obtener_chat_por_id(id_chat)
+    if not chat or chat["id_usuario"] != id_usuario:
+        raise HTTPException(
+            status_code=403, detail="No autorizado para ver mensajes de este chat."
+        )
+
+    mensajes = crud_mensajes.obtener_mensajes_chat(id_chat)
+    return mensajes
+
+
 @router.get("/{id_chat}/{id_contexto}", response_model=list[MensajeOut])
 def obtener_mensajes(
     id_chat: int, id_contexto: int, id_usuario: int = Depends(verificar_token)
@@ -46,16 +58,4 @@ def obtener_mensajes(
         )
 
     mensajes = crud_mensajes.obtener_mensajes_contexto(id_chat, id_contexto)
-    return mensajes
-
-
-@router.get("/chat/{id_chat}", response_model=list[MensajeOut])
-def obtener_mensajes_chat(id_chat: int, id_usuario: int = Depends(verificar_token)):
-    chat = crud_chats.obtener_chat_por_id(id_chat)
-    if not chat or chat["id_usuario"] != id_usuario:
-        raise HTTPException(
-            status_code=403, detail="No autorizado para ver mensajes de este chat."
-        )
-
-    mensajes = crud_mensajes.obtener_mensajes_chat(id_chat)
     return mensajes

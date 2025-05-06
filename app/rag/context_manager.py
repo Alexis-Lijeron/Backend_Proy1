@@ -27,7 +27,11 @@ class ContextManager:
         """
         Usa un modelo LLM para determinar si una nueva pregunta está relacionada con el contexto anterior.
         """
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+        llm = ChatOpenAI(
+            model_name="gpt-3.5-turbo",
+            temperature=0,
+            openai_api_key=settings.OPENAI_API_KEY,
+        )
         mensajes = [
             SystemMessage(
                 content="Eres un clasificador experto en conversaciones legales. "
