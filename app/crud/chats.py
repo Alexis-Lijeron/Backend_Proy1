@@ -1,16 +1,22 @@
 from app.core.db_connection import get_connection
+from datetime import datetime
 
 
 def crear_chat(id_usuario: int, titulo: str = None) -> dict:
+    fecha_inicio = datetime.utcnow()
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
-            INSERT INTO chats (id_usuario, titulo)
-            VALUES (%s, %s)
+            INSERT INTO chats (id_usuario, titulo, fecha_inicio)
+            VALUES (%s, %s, %s)
             RETURNING id_chat, fecha_inicio
             """,
-                (id_usuario, titulo),
+                (
+                    id_usuario,
+                    titulo,
+                    fecha_inicio,
+                ),  # 👈 ahora sí usas la fecha que creaste arriba
             )
             id_chat, fecha_inicio = cursor.fetchone()
             conn.commit()

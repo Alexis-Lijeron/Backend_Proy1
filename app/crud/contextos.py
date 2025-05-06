@@ -1,4 +1,5 @@
 from app.core.db_connection import get_connection
+from datetime import datetime
 
 
 def obtener_siguiente_contexto_numero(id_chat: int) -> int:
@@ -7,7 +8,7 @@ def obtener_siguiente_contexto_numero(id_chat: int) -> int:
             cursor.execute(
                 """
             SELECT COALESCE(MAX(contexto_numero), 0) + 1
-            FROM contextos_chat
+            FROM contextos
             WHERE id_chat = %s
             """,
                 (id_chat,),
@@ -22,13 +23,19 @@ def crear_contexto(id_chat: int, descripcion: str = None) -> dict:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
-            INSERT INTO contextos_chat (id_chat, contexto_numero, descripcion)
+            INSERT INTO contextos (id_chat, contexto_numero, descripcion)
             VALUES (%s, %s, %s)
             RETURNING id_contexto, fecha_inicio
             """,
                 (id_chat, contexto_numero, descripcion),
             )
-            id_contexto, fecha_inicio = cursor.fetchone()
+            resultado = cursor.fetchone()
+            id_contexto = resultado[0]
+            fecha_inicio = resultado[1]
+
+            if fecha_inicio is None:
+                fecha_inicio = datetime.utcnow()
+
             conn.commit()
             return {
                 "id_contexto": id_contexto,
@@ -43,7 +50,7 @@ def obtener_contextos_chat(id_chat: int):
             cursor.execute(
                 """
             SELECT id_contexto, id_chat, contexto_numero, descripcion, fecha_inicio
-            FROM contextos_chat
+            FROM contextos
             WHERE id_chat = %s
             ORDER BY contexto_numero
             """,

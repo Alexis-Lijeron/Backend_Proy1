@@ -6,7 +6,7 @@ import time
 
 from app.rag.core import RAGSystem
 from app.crud.mensajes import insertar_mensaje
-from app.crud.contextos import crear_contexto  
+from app.crud.contextos import crear_contexto
 
 router = APIRouter(prefix="/rag", tags=["RAG"])
 
@@ -78,7 +78,7 @@ def buscar_respuesta(params: SearchRequest):
                 id_chat=params.id_chat,
                 descripcion="Nuevo contexto creado automáticamente por cambio de tema",
             )
-            id_contexto_usado = nuevo_id_contexto
+            id_contexto_usado = nuevo_id_contexto["id_contexto"]
         except Exception as e:
             raise HTTPException(
                 status_code=500, detail=f"Error al crear nuevo contexto: {str(e)}"
@@ -151,3 +151,30 @@ def estadisticas_feedback():
     """
     stats = rag_system.feedback_db.get_feedback_stats()
     return stats
+
+
+@router.post("/public_search")
+def buscar_respuesta_publica(params: SearchRequest):
+    """
+    Versión sin autenticación. Usa siempre el historial acumulado.
+    """
+    pregunta_filtrada = rag_system.reemplazador.reemplazar_palabras(params.pregunta)
+
+    # Armar el contexto acumulado (historial + nueva pregunta)
+    contexto_completo = "\n".join(params.historial or [])
+    contexto_completo += f"\nPregunta actual: {pregunta_filtrada}"
+
+    # Buscar con ese contexto acumulado
+    results = rag_system.search(contexto_completo, k=params.k)
+
+    # Generar respuesta SIN clasificador de contexto
+    respuesta = rag_system.build_response_without_context(results, pregunta_filtrada)
+
+    response_id = hashlib.md5(f"{params.pregunta}-{time.time()}".encode()).hexdigest()
+
+    return {
+        "pregunta": params.pregunta,
+        "respuesta": respuesta,
+        "resultados": results,
+        "response_id": response_id,
+    }

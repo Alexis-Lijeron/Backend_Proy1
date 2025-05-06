@@ -30,20 +30,34 @@ class ContextManager:
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         mensajes = [
             SystemMessage(
-                content="Eres un clasificador de contexto. Responde solo 'Relacionado' o 'Nuevo tema'."
+                content="Eres un clasificador experto en conversaciones legales. "
+                "Determina si la nueva pregunta está relacionada con la pregunta y respuesta previas, considerando el historial de conversación. "
+                "Debes tomar en cuenta que las personas a menudo hacen preguntas cortas o usan pronombres cuando continúan con un tema. "
+                "Responde solo con 'Relacionado' si la nueva pregunta sigue el tema anterior o pide detalles adicionales, "
+                "aunque la redacción sea diferente o resumida. "
+                "Responde 'Nuevo tema' si cambia completamente de asunto."
             ),
             HumanMessage(
                 content=f"""
-Pregunta anterior: {prev_question}
-Nueva pregunta: {new_question}
-Respuesta previa: {prev_answer}
-Historial de contexto: {context_history}
-"""
+    Pregunta anterior: {prev_question}
+    Nueva pregunta: {new_question}
+    Respuesta previa: {prev_answer}
+    Historial de contexto: {context_history}
+    """
             ),
         ]
         respuesta = llm.invoke(mensajes)
         logger.info(f"🔍 Evaluando contexto... Resultado del LLM: {respuesta.content}")
         return "relacionado" in respuesta.content.lower()
+
+    """ except Exception as e:
+        logger.error(f"⚠️ Error usando el LLM: {str(e)}. Usando embeddings como respaldo.")
+        return self.in_context_embeddings(prev_question, new_question, prev_answer)
+        respuesta = llm.invoke(mensajes)
+        decision = respuesta.content.strip().lower()
+        logger.info(f"🔍 Evaluando contexto... Resultado del LLM: {respuesta.content}")
+        # return "relacionado" in respuesta.content.lower()
+        return decision.startswith("relacionado") """
 
     def in_context_embeddings(
         self, prev_question: str, new_question: str, prev_answer: str
