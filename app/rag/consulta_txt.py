@@ -165,6 +165,7 @@ def buscar_contenido(documento, titulo=None, capitulo=None, articulo=None):
     return "No se encontró contenido con los parámetros especificados."
 
 
+# Obtener el resultado de búsqueda
 @router.get("/buscar")
 def buscar(
     documento: str,
